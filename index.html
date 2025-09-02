@@ -6,7 +6,9 @@
     body { font-family: Arial; text-align: center; }
     .container { display: flex; flex-direction: column; align-items: center; gap: 10px; }
     button { background: blue; color: white; padding: 10px; cursor: pointer; }
-    img { max-width: 200px; }
+    .preview { position: relative; width: 300px; height: 400px; display: flex; justify-content: center; align-items: flex-start; }
+    .preview img { max-width: 100%; position: absolute; }
+    .overlay { opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -14,25 +16,37 @@
   <div class="container">
     <input id="height" type="number" placeholder="Рост, см">
     <input id="weight" type="number" placeholder="Вес, кг">
+    <input id="photo" type="file" accept="image/*">
     <select id="clothing">
-      <option value="штаны">Штаны</option>
-      <option value="футболку">Футболка</option>
+      <option value="sweater.png">Кофта</option>
+      <option value="tshirt.png">Футболка</option>
     </select>
-    <button onclick="showRecommendation()">Подобрать</button>
-    <div id="result"></div>
+    <button onclick="tryOn()">Примерить</button>
+    <div class="preview" id="preview"></div>
   </div>
 
   <script>
-    function showRecommendation() {
+    function tryOn() {
       const height = document.getElementById('height').value;
       const weight = document.getElementById('weight').value;
+      const photo = document.getElementById('photo').files[0];
       const clothing = document.getElementById('clothing').value;
-      const result = document.getElementById('result');
-      if (height && weight) {
-        result.innerHTML = `Рекомендуем ${clothing} для роста ${height} см и веса ${weight} кг`;
-      } else {
-        result.innerHTML = 'Укажите параметры';
+      const preview = document.getElementById('preview');
+
+      if (!height || !weight || !photo) {
+        preview.innerHTML = 'Заполните все поля и загрузите фото';
+        return;
       }
+
+      const img = new Image();
+      img.src = URL.createObjectURL(photo);
+      img.onload = () => {
+        const scale = height / 220; // Пример: масштабируем одежду по росту
+        preview.innerHTML = `
+          <img src="${img.src}" style="max-height: 400px;">
+          <img src="${clothing}" class="overlay" style="transform: scale(${scale}); top: 30px;">
+        `;
+      };
     }
   </script>
 </body>
