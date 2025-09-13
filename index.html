@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Подбор одежды</title>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    .container { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    button { background: blue; color: white; padding: 10px; cursor: pointer; }
+    #result { color: green; }
+  </style>
+</head>
+<body>
+  <h1>Подбор одежды</h1>
+  <div class="container">
+    <input id="height" type="number" placeholder="Рост (см)">
+    <input id="weight" type="number" placeholder="Вес (кг)">
+    <select id="clothing">
+      <option value="sweater">Кофта</option>
+      <option value="shirt">Футболка</option>
+    </select>
+    <button onclick="getRecommendation()">Подобрать</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function getRecommendation() {
+      const height = document.getElementById('height').value;
+      const weight = document.getElementById('weight').value;
+      const clothing = document.getElementById('clothing').value;
+      const result = document.getElementById('result');
+
+      if (!height || !weight) {
+        result.innerHTML = 'Заполните все поля';
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ height, weight })
+      });
+      const data = await response.json();
+      result.innerHTML = `Рекомендуем ${clothing}, размер: ${data.size}`;
+    }
+  </script>
+</body>
+</html>
